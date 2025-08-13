@@ -1,3 +1,4 @@
+import { ROUTES } from '../../../api/constants/apiRoutes';
 import { expect } from '../../../common/helpers/pw';
 import { BasePage } from '../BasePage';
 export class SignInPage extends BasePage {
@@ -32,5 +33,17 @@ export class SignInPage extends BasePage {
     await this.step(`Assert the '${messageText}' error is shown`, async () => {
       await expect(this.errorMessage).toContainText(messageText);
     });
+  }
+
+  async clickSignInButtonAndWaitForRequest() {
+    return await this.step(
+      `Click the 'Sign up' button and wait for request`,
+      async () => {
+        const requestPromise = this.page.waitForRequest(ROUTES.users.login);
+
+        await this.signInButton.click();
+        return await requestPromise;
+      },
+    );
   }
 }
