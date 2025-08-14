@@ -36,3 +36,4 @@ In this task you will practice using the waitForRequest method.
 2. Push the code to the origin.
 3. Create a PR for your changes.
 4. Keep implementing suggestions from code review until your PR is approved.
+Fixed bug
