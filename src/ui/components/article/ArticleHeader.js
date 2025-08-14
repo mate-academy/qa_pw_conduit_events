@@ -16,6 +16,9 @@ export class ArticleHeader extends BaseComponent {
         name: 'Unfavorite Article',
       })
       .first();
+    this.commentField = page.getByPlaceholder('Write a comment...');
+    this.postCommentBtn = page.getByRole('button', { name: 'Post Comment' });
+    this.deleteCommentBtn = page.locator('.ion-trash-a');
   }
 
   async clickFollowArtcileAndWaitForRequest() {
@@ -89,5 +92,35 @@ export class ArticleHeader extends BaseComponent {
         await expect(this.articleFavoriteButton).toBeVisible();
       },
     );
+  }
+
+  async leaveCommentAndWaitRequest(comment) {
+    await this.step(`Leave the comment and wait for the request`, async () => {
+      const requestPromise = this.page.waitForRequest(
+        `**${ROUTES.articles('**').comments}`,
+      );
+      await this.commentField.fill(comment);
+      await this.postCommentBtn.click();
+
+      const request = await requestPromise;
+
+      expect(request.url()).toContain('comments');
+      expect(request.method()).toEqual('POST');
+    });
+  }
+
+  async deletecommentAndWaitRequest() {
+    await this.step(`Delete comment and wait for the request`, async () => {
+      const requestPromise = this.page.waitForRequest(
+        '**/api/articles/**/comments/**',
+      );
+
+      await this.deleteCommentBtn.click();
+
+      const request = await requestPromise;
+
+      expect(request.url()).toContain('comments');
+      expect(request.method()).toEqual('DELETE');
+    });
   }
 }
