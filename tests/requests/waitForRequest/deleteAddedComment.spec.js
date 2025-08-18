@@ -2,6 +2,8 @@ import { test } from '../../_fixtures/fixtures';
 import { ViewArticlePage } from '../../../src/ui/pages/article/ViewArticlePage';
 import { createArticle } from '../../../src/ui/actions/articles/createArticle';
 import { signUpUser } from '../../../src/ui/actions/auth/signUpUser';
+import { ROUTES } from '../../../src/api/constants/apiRoutes';
+import { expect } from 'allure-playwright';
 
 /*
 Preconditions:
@@ -11,12 +13,12 @@ Preconditions:
 
 Test:
 1. Open article as User2
-2. Add new comment to the article and 
-  wait for request to the /api/articles/{slug}/comments 
+2. Add new comment to the article and
+  wait for request to the /api/articles/{slug}/comments
   - assert the request url contains 'comments'
   - assert the request method is POST
 3. Remove just added comment and
-  wait for request to the /api/articles/{slug}/comments/{commentId} 
+  wait for request to the /api/articles/{slug}/comments/{commentId}
   - assert the request url contains 'comments'
   - assert the request method is DELETE
 */
@@ -29,4 +31,15 @@ test.beforeEach(async ({ pages, users, articleWithoutTags }) => {
   await createArticle(pages[0], articleWithoutTags, 1);
 });
 
-test('Delete just added comment to article created by another user', async ({}) => {});
+test('Delete just added comment to article created by another user', async ({
+  pages,
+  articleWithoutTags
+}) => {
+  const viewArticlePage = new ViewArticlePage(pages[1], 2);
+
+  await viewArticlePage.open(articleWithoutTags.url);
+  const request = await viewArticlePage.clickPostCommentButtonAndWaitForRequest();
+
+  expect(request.url()).toContain(ROUTES.articles.index);
+  expect(request.method()).toEqual('POST');
+});
