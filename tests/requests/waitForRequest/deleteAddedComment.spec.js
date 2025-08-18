@@ -5,24 +5,6 @@ import { signUpUser } from '../../../src/ui/actions/auth/signUpUser';
 import { ROUTES } from '../../../src/api/constants/apiRoutes';
 import { expect } from 'allure-playwright';
 
-/*
-Preconditions:
-1. Sign up User1
-2. Sign up User 2
-3. Create article as User1
-
-Test:
-1. Open article as User2
-2. Add new comment to the article and
-  wait for request to the /api/articles/{slug}/comments
-  - assert the request url contains 'comments'
-  - assert the request method is POST
-3. Remove just added comment and
-  wait for request to the /api/articles/{slug}/comments/{commentId}
-  - assert the request url contains 'comments'
-  - assert the request method is DELETE
-*/
-
 test.use({ contextsNumber: 2, usersNumber: 2 });
 
 test.beforeEach(async ({ pages, users, articleWithoutTags }) => {
@@ -38,8 +20,15 @@ test('Delete just added comment to article created by another user', async ({
   const viewArticlePage = new ViewArticlePage(pages[1], 2);
 
   await viewArticlePage.open(articleWithoutTags.url);
-  const request = await viewArticlePage.clickPostCommentButtonAndWaitForRequest();
+  const request1 = await viewArticlePage.clickPostCommentButtonAndWaitForRequest(articleWithoutTags.slug);
 
-  expect(request.url()).toContain(ROUTES.articles.index);
-  expect(request.method()).toEqual('POST');
+  expect(request1.url()).toContain(ROUTES.articles(articleWithoutTags.slug).index + '/comments');
+  expect(request1.method()).toBe('POST');
+
+  await viewArticlePage.clickDeleteCommentButtonAndWaitForRequest();
+
+  const request2 = await viewArticlePage.clickDeleteCommentButtonAndWaitForRequest();
+
+  expect(request2.url()).toContain('/comments');
+  expect(request2.method()).toBe('DELETE');
 });

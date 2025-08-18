@@ -32,14 +32,9 @@ export class ViewArticlePage extends BasePage {
 
   async clickPostCommentButtonAndWaitForRequest(slug) {
     return await this.step(
-      `Click the 'Post comment' button and wait for request `,
+      `Click the 'post comment' button and wait for request `,
       async () => {
         const sentence = faker.lorem.sentence();
-
-        this.page.on('request', req => {
-          console.log('➡️ REQUEST:', req.method(), req.url());
-        });
-
         const requestPromise = this.page.waitForRequest(
           req =>
             req.url().includes(ROUTES.articles(slug).index + '/comments') &&
@@ -54,10 +49,21 @@ export class ViewArticlePage extends BasePage {
     );
   }
 
-  async deleteComment() {
-    await this.step('click delete comment button', async () => {
-      await this.deleteIcon.click();
-    });
+  async clickDeleteCommentButtonAndWaitForRequest() {
+    return await this.step(
+      `Click the 'delete comment' button and wait for request `,
+      async () => {
+        const requestPromise = this.page.waitForRequest(
+          req =>
+            req.url().includes('/comments') &&
+            req.method() === 'DELETE'
+        );
+
+        await this.deleteIcon.click();
+
+        return await requestPromise;
+      },
+    );
   }
 
   async assertArticleTextIsVisible(text) {
