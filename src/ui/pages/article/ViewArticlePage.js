@@ -1,6 +1,7 @@
 import { expect } from '../../../common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ArticleHeader } from '../../components/article/ArticleHeader';
+import { ROUTES } from '../../../api/constants/apiRoutes';
 
 export class ViewArticlePage extends BasePage {
   articleId;
@@ -19,12 +20,56 @@ export class ViewArticlePage extends BasePage {
         name: 'Unfavorite Article',
       })
       .last();
+    this.articleCommentField = page.getByPlaceholder('Write a comment...');
+    this.postCommentButton = page.getByRole('button', {name: 'Post Comment'});
+
+  }
+
+  getRemoveCommentButtonByCommentText(commentText) {
+    const target = this.page.getByText(commentText);
+    const brother = target.locator('xpath=following-sibling::*[1]');
+    return brother.locator('.ion-trash-a');
   }
 
   tagListItem(tagName) {
     return this.page.getByRole('listitem').filter({ hasText: tagName });
   }
 
+  async addCommentForArticleAndWaitForRequest(newComment) {
+    await this.step(
+      `Add new article comment ${newComment} and wait for request`,
+      async () => {
+
+        const requestPromise = this.page.waitForRequest(
+            `**${ROUTES.articles('**').comment}`
+          );
+
+        await this.articleCommentField.fill(newComment);
+        await this.postCommentButton.click();
+
+        const request = await requestPromise;
+
+        expect(request.url()).toContain('comments');
+        expect(request.method()).toEqual('POST');
+      });
+  }
+
+  async removeCommentForArticleAndWaitForRequest(rComment) {
+    return await this.step(
+      `Remove created article comment ${rComment} and wait for request`,
+      async () => {
+
+        const requestPromise = this.page.waitForRequest(
+          `**${ROUTES.articles('**').comment}/**`
+        );
+        await this.getRemoveCommentButtonByCommentText(rComment).click();
+
+        const request = await requestPromise;
+
+        expect(request.url()).toContain('comments');
+        expect(request.method()).toEqual('DELETE');
+      });
+  }
   async assertArticleTextIsVisible(text) {
     await this.step(`Assert the article has correct text`, async () => {
       await expect(this.page.getByText(text)).toBeVisible();
@@ -56,4 +101,5 @@ export class ViewArticlePage extends BasePage {
       },
     );
   }
+
 }
