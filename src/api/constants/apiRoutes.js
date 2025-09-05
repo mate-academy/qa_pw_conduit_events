@@ -2,6 +2,7 @@ export const ROOT = '/api';
 
 export const ROUTES = {
   user: `${ROOT}/user`,
+  comments: '**/comments',
   users: {
     index: `${ROOT}/users`,
     login: `${ROOT}/users/login`,

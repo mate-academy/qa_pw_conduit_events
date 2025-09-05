@@ -21,6 +21,9 @@ Test:
   - assert the request method is DELETE
 */
 
+
+const commentText = 'Test comment';
+
 test.use({ contextsNumber: 2, usersNumber: 2 });
 
 test.beforeEach(async ({ pages, users, articleWithoutTags }) => {
@@ -29,4 +32,12 @@ test.beforeEach(async ({ pages, users, articleWithoutTags }) => {
   await createArticle(pages[0], articleWithoutTags, 1);
 });
 
-test('Delete just added comment to article created by another user', async ({}) => {});
+test('Delete just added comment to article created by another user', async ({
+  pages,
+  articleWithoutTags,
+}) => {
+  const viewArticlePage = new ViewArticlePage(pages[1], 2);
+  await viewArticlePage.open(articleWithoutTags.url);
+  await viewArticlePage.addCommentAndWaitForRequest(commentText);
+  await viewArticlePage.removeCommentAndWaitForRequest(commentText);
+});

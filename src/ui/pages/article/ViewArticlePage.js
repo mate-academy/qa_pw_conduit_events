@@ -1,6 +1,7 @@
 import { expect } from '../../../common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ArticleHeader } from '../../components/article/ArticleHeader';
+import { ROUTES } from '../../../api/constants/apiRoutes';
 
 export class ViewArticlePage extends BasePage {
   articleId;
@@ -19,6 +20,11 @@ export class ViewArticlePage extends BasePage {
         name: 'Unfavorite Article',
       })
       .last();
+    this.commentInput = this.page.getByPlaceholder('Write a comment...');
+    this.postCommentButton = this.page.getByRole('button', {
+      name: 'Post Comment',
+    });
+    this.card = this.page.locator('.card');
   }
 
   tagListItem(tagName) {
@@ -55,5 +61,41 @@ export class ViewArticlePage extends BasePage {
         await expect(this.articleFavoriteButton).toBeVisible();
       },
     );
+  }
+
+  async addComment(commentText) {
+    await this.step(`Add comment with text '${commentText}'`, async () => {
+      await this.commentInput.fill(commentText);
+      await this.postCommentButton.click();
+    });
+  }
+
+  async removeComment(commentText) {
+    await this.step(`Remove comment with text '${commentText}'`, async () => {
+      const comment = this.card.filter({ hasText: commentText });
+      const deleteButton = comment.locator('.ion-trash-a');
+      await deleteButton.click();
+    });
+  }
+
+  async addCommentAndWaitForRequest(commentText) {
+    return await this.step(`Add comment and wait for request`, async () => {
+      const requestPromise = this.page.waitForRequest(ROUTES.comments);
+      await this.addComment(commentText);
+      const request = await requestPromise;
+      expect(request.url()).toContain('comments');
+      expect(request.method()).toBe('POST');
+    });
+  }
+
+  async removeCommentAndWaitForRequest(commentText) {
+    return await this.step(`Remove comment and wait for request`, async () => {
+      const url = ROUTES.comments + '/**';
+      const requestPromise = this.page.waitForRequest(url);
+      await this.removeComment(commentText);
+      const request = await requestPromise;
+      expect(request.url()).toContain('comments');
+      expect(request.method()).toBe('DELETE');
+    });
   }
 }
