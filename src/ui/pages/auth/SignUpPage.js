@@ -39,7 +39,7 @@ export class SignUpPage extends BasePage {
 
   async clickSignUpButtonAndWaitForRequest() {
     return await this.step(
-      `Click the 'Sign up' button and wait for request `,
+      `Click the 'Sign up' button and wait for request`,
       async () => {
         const requestPromise = this.page.waitForRequest(ROUTES.users.index);
 
