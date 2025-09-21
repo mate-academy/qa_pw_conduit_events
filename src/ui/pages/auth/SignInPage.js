@@ -1,5 +1,7 @@
 import { expect } from '../../../common/helpers/pw';
 import { BasePage } from '../BasePage';
+import { ROUTES } from '../../../api/constants/apiRoutes';
+
 export class SignInPage extends BasePage {
   constructor(page, userId = 0) {
     super(page, userId);
@@ -25,6 +27,18 @@ export class SignInPage extends BasePage {
   async clickSignInButton() {
     await this.step(`Click the 'Sign in' button`, async () => {
       await this.signInButton.click();
+    });
+  }
+
+  async clickSignInButtonAndWaitForRequest() {
+    return await this.step(`Click 'Sign in' and wait for login request`, async () => {
+      const [req] = await Promise.all([
+        this.page.waitForRequest(r =>
+          r.url().includes(ROUTES.users.login) && r.method() === 'POST'
+        ),
+        this.signInButton.click(), // ⬅ reuse the locator from constructor
+      ]);
+      return req;
     });
   }
 
