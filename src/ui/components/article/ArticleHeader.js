@@ -90,4 +90,34 @@ export class ArticleHeader extends BaseComponent {
       },
     );
   }
+
+  async leaveCommentAndWaitRequest(comment) {
+    await this.step(`Leave the comment and wait for the request`, async () => {
+      const requestPromise = this.page.waitForRequest(
+        `**${ROUTES.articles('**').comments}`,
+      );
+      await this.commentField.fill(comment);
+      await this.postCommentBtn.click();
+
+      const request = await requestPromise;
+
+      expect(request.url()).toContain('comments');
+      expect(request.method()).toEqual('POST');
+    });
+  }
+
+  async deletecommentAndWaitRequest() {
+    await this.step(`Delete comment and wait for the request`, async () => {
+      const requestPromise = this.page.waitForRequest(
+        '**/api/articles/**/comments/**',
+      );
+
+      await this.deleteCommentBtn.click();
+
+      const request = await requestPromise;
+
+      expect(request.url()).toContain('comments');
+      expect(request.method()).toEqual('DELETE');
+    });
+  }
 }
