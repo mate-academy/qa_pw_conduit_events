@@ -1,12 +1,16 @@
 import { test } from '../../_fixtures/fixtures';
+import { expect } from '../../../src/common/helpers/pw';
+import { ROUTES } from '../../../src/api/constants/apiRoutes';
 
-/*
-Test:
-1. Open sign in page
-2. Create a new method within the 'SignInPage' class that 
-  click the 'Sign in' button and wais for the request sent to the /api/users 
-3. Assert the request URL is equal to the expected
-4. Assert the request method is POST 
-*/
+test('Click `Sign in` and check request sent', async ({ signInPage }) => {
+  // 1. Otwórz stronę logowania
+  await signInPage.open();
 
-test('Click `Sign in` and check request sent', async ({}) => {});
+  // 2. Kliknij przycisk Sign In i poczekaj na żądanie
+  const request = await signInPage.clickSignInButtonAndWaitForRequest();
+
+  // 3. Sprawdź, czy wysłano właściwe żądanie
+  expect(request.url()).toContain(ROUTES.users.login); // POST na /users/login
+  expect(request.method()).toEqual('POST');
+});
+
