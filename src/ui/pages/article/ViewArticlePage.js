@@ -1,6 +1,7 @@
 import { expect } from '../../../common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ArticleHeader } from '../../components/article/ArticleHeader';
+import { ArticleComments } from '../../components/article/ArticleComments';
 
 export class ViewArticlePage extends BasePage {
   articleId;
@@ -8,6 +9,7 @@ export class ViewArticlePage extends BasePage {
   constructor(page, userId = 0) {
     super(page, userId);
     this.articleHeader = new ArticleHeader(page);
+    this.articleComments = new ArticleComments(page, userId);
     this.articleTitleHeader = page.getByRole('heading');
     this.articleFavoriteButton = page
       .getByRole('button', {

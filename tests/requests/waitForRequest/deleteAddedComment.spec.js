@@ -1,4 +1,5 @@
 import { test } from '../../_fixtures/fixtures';
+import { expect } from '../../../src/common/helpers/pw';
 import { ViewArticlePage } from '../../../src/ui/pages/article/ViewArticlePage';
 import { createArticle } from '../../../src/ui/actions/articles/createArticle';
 import { signUpUser } from '../../../src/ui/actions/auth/signUpUser';
@@ -29,4 +30,22 @@ test.beforeEach(async ({ pages, users, articleWithoutTags }) => {
   await createArticle(pages[0], articleWithoutTags, 1);
 });
 
-test('Delete just added comment to article created by another user', async ({}) => {});
+test('Delete just added comment to article created by another user', async ({
+  articleWithoutTags,
+  pages,
+}) => {
+  const viewArticlePage = new ViewArticlePage(pages[1], 2);
+  const articleComments = viewArticlePage.articleComments;
+
+  await viewArticlePage.open(articleWithoutTags.url);
+
+  const addCommentRequest = await articleComments.addCommentAndWaitForRequest(
+    'Test comment',
+  );
+  expect(addCommentRequest.url()).toContain('comments');
+  expect(addCommentRequest.method()).toEqual('POST');
+
+  const deleteCommentRequest = await articleComments.deleteCommentAndWaitForRequest();
+  expect(deleteCommentRequest.url()).toContain('comments');
+  expect(deleteCommentRequest.method()).toEqual('DELETE');
+});
