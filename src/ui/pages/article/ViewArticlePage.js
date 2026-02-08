@@ -1,4 +1,4 @@
-import { expect } from '../../../common/helpers/pw';
+import { expect } from '#common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ArticleHeader } from '../../components/article/ArticleHeader';
 
@@ -19,6 +19,10 @@ export class ViewArticlePage extends BasePage {
         name: 'Unfavorite Article',
       })
       .last();
+    this.commentField = page.getByPlaceholder('Write a comment...');
+    this.postCommentButton = page.getByRole('button', {
+      name: 'Post Comment',
+    });
   }
 
   tagListItem(tagName) {
@@ -53,6 +57,53 @@ export class ViewArticlePage extends BasePage {
       `Assert the Favorite article button is shown in article body`,
       async () => {
         await expect(this.articleFavoriteButton).toBeVisible();
+      },
+    );
+  }
+
+  async addCommentAndWaitForPostRequest(commentText) {
+    return await this.step(
+      `Add comment and wait for POST request to comments`,
+      async () => {
+        const requestPromise = this.page.waitForRequest(
+          request =>
+            request.url().includes('comments') && request.method() === 'POST',
+        );
+
+        await this.commentField.fill(commentText);
+        await this.postCommentButton.click();
+
+        return await requestPromise;
+      },
+    );
+  }
+
+  getLastCommentDeleteButton() {
+    const deleteSelector = [
+      '[class*="trash"]',
+      '[class*="delete"]',
+      '.ion-trash-a',
+      '.ion-trash-b',
+      '[title="Delete"]',
+      '[title="delete"]',
+      '[aria-label*="delete" i]',
+    ].join(', ');
+    return this.page.locator(deleteSelector).last();
+  }
+
+  async deleteCommentAndWaitForDeleteRequest() {
+    return await this.step(
+      `Delete comment and wait for DELETE request to comments`,
+      async () => {
+        const requestPromise = this.page.waitForRequest(
+          request =>
+            request.url().includes('comments') &&
+            request.method() === 'DELETE',
+        );
+
+        await this.getLastCommentDeleteButton().click();
+
+        return await requestPromise;
       },
     );
   }
