@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "imports": {
+    "#common/helpers/pw": "./src/common/helpers/pw.js"
+  },
   "dependencies": {
     "@faker-js/faker": "^9",
     "playwright-core": "^1"
@@ -28,10 +31,7 @@
     }
   },
   "lint-staged": {
-    "*.{js,md}": [
-      "prettier --write",
-      "eslint --fix"
-    ]
+    "*.{js,md}": ["prettier --write", "eslint --fix"]
   },
   "keywords": [],
   "author": "",

@@ -1,4 +1,4 @@
-import { expect } from '../../../common/helpers/pw';
+import { expect } from '#common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ROUTES } from '../../../api/constants/apiRoutes';
 export class SignInPage extends BasePage {

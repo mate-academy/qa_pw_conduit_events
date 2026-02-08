@@ -1,5 +1,5 @@
 import { test } from '../../_fixtures/fixtures';
-import { expect } from '../../../src/common/helpers/pw';
+import { expect } from '#common/helpers/pw';
 import { ROUTES } from '../../../src/api/constants/apiRoutes';
 
 

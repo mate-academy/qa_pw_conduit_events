@@ -1,4 +1,4 @@
-import { expect } from '../../../common/helpers/pw';
+import { expect } from '#common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ArticleHeader } from '../../components/article/ArticleHeader';
 

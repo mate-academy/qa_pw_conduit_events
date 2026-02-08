@@ -1,5 +1,5 @@
 import { test } from '../../_fixtures/fixtures';
-import { expect } from '../../../src/common/helpers/pw';
+import { expect } from '#common/helpers/pw';
 import { ViewArticlePage } from '../../../src/ui/pages/article/ViewArticlePage';
 import { createArticle } from '../../../src/ui/actions/articles/createArticle';
 import { signUpUser } from '../../../src/ui/actions/auth/signUpUser';
