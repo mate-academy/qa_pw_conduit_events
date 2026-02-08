@@ -79,11 +79,16 @@ export class ViewArticlePage extends BasePage {
   }
 
   getLastCommentDeleteButton() {
-    return this.page
-      .locator(
-        '[class*="trash"], [class*="delete"], .ion-trash-a, .ion-trash-b, [title="Delete"], [title="delete"], [aria-label*="delete" i]',
-      )
-      .last();
+    const deleteSelector = [
+      '[class*="trash"]',
+      '[class*="delete"]',
+      '.ion-trash-a',
+      '.ion-trash-b',
+      '[title="Delete"]',
+      '[title="delete"]',
+      '[aria-label*="delete" i]',
+    ].join(', ');
+    return this.page.locator(deleteSelector).last();
   }
 
   async deleteCommentAndWaitForDeleteRequest() {
