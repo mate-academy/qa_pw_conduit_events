@@ -1,6 +1,7 @@
 import { expect } from '../../../common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ArticleHeader } from '../../components/article/ArticleHeader';
+import { CommentSection } from '../../actions/articles/CommentSection';
 
 export class ViewArticlePage extends BasePage {
   articleId;
@@ -8,19 +9,17 @@ export class ViewArticlePage extends BasePage {
   constructor(page, userId = 0) {
     super(page, userId);
     this.articleHeader = new ArticleHeader(page);
+    this.commentSection = new CommentSection(page, userId);
     this.articleTitleHeader = page.getByRole('heading');
     this.articleFavoriteButton = page
-      .getByRole('button', {
-        name: 'Favorite Article',
-      })
+      .getByRole('button', { name: 'Favorite Article' })
       .last();
     this.articleUnfavoriteButton = page
-      .getByRole('button', {
-        name: 'Unfavorite Article',
-      })
+      .getByRole('button', { name: 'Unfavorite Article' })
       .last();
   }
 
+  // ... остальные методы без изменений
   tagListItem(tagName) {
     return this.page.getByRole('listitem').filter({ hasText: tagName });
   }
