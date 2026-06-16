@@ -2,6 +2,7 @@ import { test } from '../../_fixtures/fixtures';
 import { ViewArticlePage } from '../../../src/ui/pages/article/ViewArticlePage';
 import { createArticle } from '../../../src/ui/actions/articles/createArticle';
 import { signUpUser } from '../../../src/ui/actions/auth/signUpUser';
+import { faker } from '@faker-js/faker';
 
 /*
 Preconditions:
@@ -29,4 +30,16 @@ test.beforeEach(async ({ pages, users, articleWithoutTags }) => {
   await createArticle(pages[0], articleWithoutTags, 1);
 });
 
-test('Delete just added comment to article created by another user', async ({}) => {});
+test('Delete just added comment to article created by another user', async ({
+  articleWithoutTags,
+  pages,
+}) => {
+  const comment = faker.lorem.sentence();
+  const viewArticlePage = new ViewArticlePage(pages[1], 2);
+
+  await viewArticlePage.open(articleWithoutTags.url);
+  await viewArticlePage.writeNewCommentAndWaitForRequest(comment);
+  await viewArticlePage.assertCommentTextIsVisible(comment);
+  await viewArticlePage.removeCommentAndWaitForRequest(comment);
+  await viewArticlePage.assertCommentTextIsNotVisible(comment);
+});
