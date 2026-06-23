@@ -13,5 +13,6 @@ export const ROUTES = {
   articles: slug => ({
     index: `${ROOT}/articles/${slug}`,
     favorite: `${ROOT}/articles/${slug}/favorite`,
+    comments: `${ROOT}/articles/${slug}/comments`,
   }),
 };
