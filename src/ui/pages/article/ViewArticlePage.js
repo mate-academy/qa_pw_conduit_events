@@ -24,7 +24,7 @@ export class ViewArticlePage extends BasePage {
       .last();
     this.commentArea = page.getByPlaceholder('Write a comment...');
     this.postCommentButton = page.getByRole('button', {name: 'Post Comment'});
-    this.deleteCoommentLink = page.locator('.ion-trash-a');
+    this.deleteCommentLink = page.locator('.ion-trash-a');
   }
 
   tagListItem(tagName) {
@@ -60,7 +60,7 @@ export class ViewArticlePage extends BasePage {
             `**${ROUTES.articles('**').comments}/${this.commentId}`,
           );
           
-          await this.deleteCoommentLink.click();
+          await this.deleteCommentLink.click();
   
           const request = await requestPromise;
   
