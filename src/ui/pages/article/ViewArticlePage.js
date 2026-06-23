@@ -6,6 +6,7 @@ import { ROUTES } from '../../../api/constants/apiRoutes';
 
 export class ViewArticlePage extends BasePage {
   articleId;
+  commentId;
 
   constructor(page, userId = 0) {
     super(page, userId);
@@ -45,6 +46,8 @@ export class ViewArticlePage extends BasePage {
   
           expect(request.url()).toContain('comments');
           expect(request.method()).toEqual('POST');
+
+          this.commentId = await request.json().comment.id;
         },
       );
     }
@@ -54,7 +57,7 @@ export class ViewArticlePage extends BasePage {
         `Click the delete comment button and wait for request`,
         async () => {
           const requestPromise = this.page.waitForRequest(
-            `**${ROUTES.articles('**').comments}`,
+            `**${ROUTES.articles('**').comments}/${this.commentId}`,
           );
           
           await this.deleteCoommentLink.click();
