@@ -1,6 +1,7 @@
 import { expect } from '../../../common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ArticleHeader } from '../../components/article/ArticleHeader';
+import { ROUTES } from '../../../api/constants/apiRoutes';
 
 export class ViewArticlePage extends BasePage {
   articleId;
@@ -19,10 +20,57 @@ export class ViewArticlePage extends BasePage {
         name: 'Unfavorite Article',
       })
       .last();
+    this.commentTextField = page.getByPlaceholder('Write a comment...');
+    this.postCommentButton = page.getByRole('button', { name: 'Post Comment' });
+    this.deleteCommentButton = commentText =>
+      page
+        .locator('.card')
+        .filter({ hasText: commentText })
+        .locator('.ion-trash-a');
   }
 
   tagListItem(tagName) {
     return this.page.getByRole('listitem').filter({ hasText: tagName });
+  }
+
+  async fillCommentField(text) {
+    await this.commentTextField.fill(text);
+  }
+
+  async clickPostCommentAndWaitForRequest() {
+    await this.step(
+      `Click the 'Post Comment' button and wait for request`,
+      async () => {
+        const requestPromise = this.page.waitForRequest(
+          `**${ROUTES.articles('**').comments}`,
+        );
+
+        await this.postCommentButton.click();
+
+        const request = await requestPromise;
+
+        expect(request.url()).toContain('comments');
+        expect(request.method()).toEqual('POST');
+      },
+    );
+  }
+
+  async clickDeleteCommentAndWaitForRequest(commentText) {
+    await this.step(
+      `Click the 'Delete Comment' button and wait for request`,
+      async () => {
+        const requestPromise = this.page.waitForRequest(
+          `**${ROUTES.articles('**').comments}/**`,
+        );
+
+        await this.deleteCommentButton(commentText).click();
+
+        const request = await requestPromise;
+
+        expect(request.url()).toContain('comments');
+        expect(request.method()).toEqual('DELETE');
+      },
+    );
   }
 
   async assertArticleTextIsVisible(text) {
