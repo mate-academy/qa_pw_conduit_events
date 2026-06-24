@@ -1,7 +1,6 @@
 import { expect } from '../../../common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ROUTES } from '../../../api/constants/apiRoutes';
-import { request } from 'playwright-core';
 
 export class SignInPage extends BasePage {
   constructor(page, userId = 0) {
@@ -35,7 +34,7 @@ export class SignInPage extends BasePage {
     return await this.step(
       `Click the 'Sign in' button and wait for request`,
       async () => {
-        const requestPromise = this.page.waitForRequest(ROUTES.users.login);
+        const requestPromise = this.page.waitForRequest(`**${ROUTES.users.login}`);
         await this.signInButton.click();
         
         return await requestPromise;
