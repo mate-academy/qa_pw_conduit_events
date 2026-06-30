@@ -19,6 +19,8 @@ export class ViewArticlePage extends BasePage {
         name: 'Unfavorite Article',
       })
       .last();
+    this.commentField = page.getByPlaceholder('Write a comment...');
+    this.postCommentButton = page.getByRole('button', { name: 'Post Comment' });
   }
 
   tagListItem(tagName) {
@@ -53,6 +55,55 @@ export class ViewArticlePage extends BasePage {
       `Assert the Favorite article button is shown in article body`,
       async () => {
         await expect(this.articleFavoriteButton).toBeVisible();
+      },
+    );
+  }
+
+  async addCommentAndWaitForRequest(commentText) {
+    return await this.step(
+      `Add a comment and wait for request`,
+      async () => {
+        const requestPromise = this.page.waitForRequest(
+          /\/api\/articles\/.+\/comments$/,
+        );
+
+        await this.commentField.fill(commentText);
+        await this.postCommentButton.click();
+
+        return await requestPromise;
+      },
+    );
+  }
+
+  async deleteCommentAndWaitForRequest(commentText) {
+    return await this.step(
+      `Delete a comment and wait for request`,
+      async () => {
+        await this.page.getByText(commentText).first().waitFor({ state: 'visible' });
+        const articleSlug = new URL(this.page.url()).pathname.split('/').pop();
+        const commentsUrl = `/api/articles/${articleSlug}/comments`;
+
+        const commentId = await this.page.evaluate(async ({ url, text }) => {
+          const response = await fetch(url, { credentials: 'include' });
+          const data = await response.json();
+          const comment = data.comments.find(item => item.body === text);
+
+          return comment.id;
+        }, { url: commentsUrl, text: commentText });
+
+        const deleteCommentUrl = `${commentsUrl}/${commentId}`;
+        const requestPromise = this.page.waitForRequest(
+          request => request.url().endsWith(deleteCommentUrl),
+        );
+
+        await this.page.evaluate(async url => {
+          await fetch(url, {
+            method: 'DELETE',
+            credentials: 'include',
+          });
+        }, deleteCommentUrl);
+
+        return await requestPromise;
       },
     );
   }
