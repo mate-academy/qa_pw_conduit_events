@@ -41,4 +41,6 @@ export class BasePage {
       await expect(this.page).toHaveURL(this.url());
     });
   }
+
+
 }

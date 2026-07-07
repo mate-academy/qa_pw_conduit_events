@@ -9,6 +9,12 @@ export class SignInPage extends BasePage {
     this.signInButton = page.getByRole('button', { name: 'Sign in' });
     this.errorMessage = page.getByRole('list').nth(1);
   }
+  async open() {
+    await this.step(`Open the 'Sign in page'`, async () => {
+      await this.page.goto(this._url);
+
+    });
+  }
 
   async fillEmailField(email) {
     await this.step(`Fill the 'Email' field`, async () => {
@@ -21,6 +27,16 @@ export class SignInPage extends BasePage {
       await this.passwordField.fill(password);
     });
   }
+  async clickSignInAndWaitForRequest(){
+    return await this.step(`Click the 'Sign in' button and wait for request`, async () => {
+      const requestPromise = this.page.waitForRequest('**/api/users/login**');
+      await this.signInButton.click();
+      return await requestPromise;
+    });
+  }
+
+
+
 
   async clickSignInButton() {
     await this.step(`Click the 'Sign in' button`, async () => {
