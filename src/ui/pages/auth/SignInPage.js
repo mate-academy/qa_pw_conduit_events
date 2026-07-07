@@ -28,12 +28,10 @@ export class SignInPage extends BasePage {
     });
   }
   async clickSignInAndWaitForRequest(){
-    await this.step(`Click the 'Sign in' button and wait for request`, async () => {
+    return await this.step(`Click the 'Sign in' button and wait for request`, async () => {
       const requestPromise = this.page.waitForRequest('**/api/users/login**');
       await this.signInButton.click();
-      const request = await requestPromise;
-      expect(request.url()).toContain('/api/users');
-      expect(request.method()).toEqual('POST');
+      return await requestPromise;
     });
   }
 

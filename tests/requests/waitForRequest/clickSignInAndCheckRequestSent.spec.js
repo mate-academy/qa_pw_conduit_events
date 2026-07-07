@@ -10,17 +10,13 @@ Test:
 4. Assert the request method is POST 
 */
 
-test('Click `Sign in` and check request sent', async ({
-signInPage, 
-page
-}) => {
- await signInPage.open();
- await signInPage.fillEmailField('test@example.com');
- await signInPage.fillPasswordField('password');
- await signInPage.clickSignInAndWaitForRequest();
- const requestPromise = page.waitForRequest('**/api/users/login**');
- await signInPage.signInButton.click();
- const request = await requestPromise;
-   expect(request.url()).toContain('/api/users');
-   expect(request.method()).toEqual('POST');
- });
+test('Click `Sign in` and check request sent', async ({ signInPage }) => {
+  await signInPage.open();
+  await signInPage.fillEmailField('test@example.com');
+  await signInPage.fillPasswordField('password');
+  
+  const request = await signInPage.clickSignInAndWaitForRequest();
+  
+  expect(request.url()).toContain('/api/users');
+  expect(request.method()).toEqual('POST');
+});

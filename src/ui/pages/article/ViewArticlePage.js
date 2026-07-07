@@ -54,10 +54,7 @@ export class ViewArticlePage extends BasePage {
     return this.page.getByRole('listitem').filter({ hasText: tagName });
   }
 
-  getCommentIdFromResponse(request) {
-    const responseBody = JSON.parse(request.postData());
-    return responseBody.comment.id;
-  }
+
 
   async assertArticleTextIsVisible(text) {
     await this.step(`Assert the article has correct text`, async () => {

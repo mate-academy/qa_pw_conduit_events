@@ -35,9 +35,9 @@ testParameters.forEach(({ email, password, message, title, page}) => {
       await signInPage.fillEmailField(email);
       await signInPage.fillPasswordField(password);
       await signInPage.clickSignInButton();
-      const requestPromise = signInPage.page.waitForRequest('**/api/users/login**');
+      // const requestPromise = signInPage.page.waitForRequest('**/api/users/login**');
       await signInPage.clickSignInButton();
-      const request = await requestPromise;
+      // const request = await requestPromise;
       await signInPage.assertErrorMessageContainsText(message);
     });
   });
