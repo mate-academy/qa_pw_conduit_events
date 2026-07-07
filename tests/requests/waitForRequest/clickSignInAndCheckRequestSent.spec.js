@@ -17,11 +17,10 @@ page
  await signInPage.open();
  await signInPage.fillEmailField('test@example.com');
  await signInPage.fillPasswordField('password');
- await signInPage.clickSignInButton();
-
-  const requestPromise = signInPage.page.waitForRequest('**/api/users/login**');
-  await signInPage.clickSignInButton();
-  const request = await requestPromise;
+ await signInPage.clickSignInAndWaitForRequest();
+ const requestPromise = page.waitForRequest('**/api/users/login**');
+ await signInPage.signInButton.click();
+ const request = await requestPromise;
    expect(request.url()).toContain('/api/users');
    expect(request.method()).toEqual('POST');
  });

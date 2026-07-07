@@ -27,6 +27,18 @@ export class SignInPage extends BasePage {
       await this.passwordField.fill(password);
     });
   }
+  async clickSignInAndWaitForRequest(){
+    await this.step(`Click the 'Sign in' button and wait for request`, async () => {
+      const requestPromise = this.page.waitForRequest('**/api/users/login**');
+      await this.signInButton.click();
+      const request = await requestPromise;
+      expect(request.url()).toContain('/api/users');
+      expect(request.method()).toEqual('POST');
+    });
+  }
+
+
+
 
   async clickSignInButton() {
     await this.step(`Click the 'Sign in' button`, async () => {
