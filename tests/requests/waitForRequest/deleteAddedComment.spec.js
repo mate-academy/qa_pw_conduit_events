@@ -2,6 +2,7 @@ import { test } from '../../_fixtures/fixtures';
 import { ViewArticlePage } from '../../../src/ui/pages/article/ViewArticlePage';
 import { createArticle } from '../../../src/ui/actions/articles/createArticle';
 import { signUpUser } from '../../../src/ui/actions/auth/signUpUser';
+import { expect } from '@playwright/test';
 
 /*
 Preconditions:
@@ -29,4 +30,46 @@ test.beforeEach(async ({ pages, users, articleWithoutTags }) => {
   await createArticle(pages[0], articleWithoutTags, 1);
 });
 
-test('Delete just added comment to article created by another user', async ({}) => {});
+test('Delete just added comment to article created by another user', async ({
+   pages,
+  articleWithoutTags,
+}) => {
+const viewArticlePage = new ViewArticlePage(pages[1], 2);
+await viewArticlePage.open(articleWithoutTags.url);
+await viewArticlePage.fillComment(
+  'This is a new comment to the article created by another user'
+);
+const slug = new URL(articleWithoutTags.url).pathname.split('/').pop();
+
+const requestPromise = viewArticlePage.page.waitForRequest(
+  (request) =>
+    request.url().includes(`/api/articles/${slug}/comments`) &&
+    request.method() === 'POST'
+);
+const responsePromise = viewArticlePage.page.waitForResponse(
+  (response) =>
+    response.url().includes(`/api/articles/${slug}/comments`) &&
+    response.request().method() === 'POST'
+);
+
+await viewArticlePage.clickPostCommentButton();
+const request = await requestPromise;
+expect(request.url()).toContain('comments');
+expect(request.method()).toEqual('POST');
+
+const response = await responsePromise;
+const responseBody = await response.json();
+const commentId = responseBody.comment.id;
+
+
+const deleteRequestPromise = viewArticlePage.page.waitForRequest(
+  (deleteRequest) =>
+    deleteRequest.url().includes(`/api/articles/${slug}/comments/${commentId}`) &&
+    deleteRequest.method() === 'DELETE'
+);
+await viewArticlePage.deleteComment();
+
+const deleteRequest = await deleteRequestPromise;
+expect(deleteRequest.url()).toContain('comments');
+expect(deleteRequest.method()).toEqual('DELETE');
+});

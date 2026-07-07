@@ -1,4 +1,5 @@
 import { test } from '../../_fixtures/fixtures';
+import { expect } from '@playwright/test';
 
 /*
 Test:
@@ -9,4 +10,18 @@ Test:
 4. Assert the request method is POST 
 */
 
-test('Click `Sign in` and check request sent', async ({}) => {});
+test('Click `Sign in` and check request sent', async ({
+signInPage, 
+page
+}) => {
+ await signInPage.open();
+ await signInPage.fillEmailField('test@example.com');
+ await signInPage.fillPasswordField('password');
+ await signInPage.clickSignInButton();
+
+  const requestPromise = signInPage.page.waitForRequest('**/api/users/login**');
+  await signInPage.clickSignInButton();
+  const request = await requestPromise;
+   expect(request.url()).toContain('/api/users');
+   expect(request.method()).toEqual('POST');
+ });

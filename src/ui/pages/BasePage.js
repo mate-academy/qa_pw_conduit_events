@@ -41,4 +41,15 @@ export class BasePage {
       await expect(this.page).toHaveURL(this.url());
     });
   }
+
+
+  async assertMethodIsEqual(request, expectedMethod) {
+    await this.step(
+      `Assert the request method is equal to ${expectedMethod}`,
+      async () => {
+        expect(request.method()).toEqual(expectedMethod);
+      },
+    );
+}
+
 }

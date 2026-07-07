@@ -28,13 +28,16 @@ const testParameters = [
   },
 ];
 
-testParameters.forEach(({ email, password, message, title }) => {
+testParameters.forEach(({ email, password, message, title, page}) => {
   test.describe('Sign in negative tests', () => {
     test(`Sign in with ${title}`, async ({ signInPage }) => {
       await signInPage.open();
       await signInPage.fillEmailField(email);
       await signInPage.fillPasswordField(password);
       await signInPage.clickSignInButton();
+      const requestPromise = signInPage.page.waitForRequest('**/api/users/login**');
+      await signInPage.clickSignInButton();
+      const request = await requestPromise;
       await signInPage.assertErrorMessageContainsText(message);
     });
   });

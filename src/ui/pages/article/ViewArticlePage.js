@@ -19,10 +19,44 @@ export class ViewArticlePage extends BasePage {
         name: 'Unfavorite Article',
       })
       .last();
+    this.commentTextArea = page.getByPlaceholder('Write a comment...');
+    this.commentPostButton = page.getByRole('button', { name: 'Post Comment' });
+    this.commentDeleteButton = page.locator('i.ion-trash-a');
   }
+
+  async fillComment(commentText) {
+    await this.step(
+      `Add new comment to the article and wait for request`, async () =>{
+       await this.commentTextArea.fill(commentText);
+      }
+    );
+  }
+
+
+
+  async deleteComment() {
+    await this.step(
+      `Delete the comment and wait for request`, async () =>{
+       await this.commentDeleteButton.click();
+      }
+    );
+  }
+
+ async clickPostCommentButton(){
+  await this.step(
+    `Click the 'Post Comment' button and wait for request`, async () =>{
+     await this.commentPostButton.click();
+    }
+  );
+ }
 
   tagListItem(tagName) {
     return this.page.getByRole('listitem').filter({ hasText: tagName });
+  }
+
+  getCommentIdFromResponse(request) {
+    const responseBody = JSON.parse(request.postData());
+    return responseBody.comment.id;
   }
 
   async assertArticleTextIsVisible(text) {
