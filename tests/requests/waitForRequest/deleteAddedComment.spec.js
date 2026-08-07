@@ -29,4 +29,27 @@ test.beforeEach(async ({ pages, users, articleWithoutTags }) => {
   await createArticle(pages[0], articleWithoutTags, 1);
 });
 
-test('Delete just added comment to article created by another user', async ({}) => {});
+test('Delete just added comment to article created by another user', async ({
+  pages,
+  articleWithoutTags,
+}) => {
+  const comment = 'This is a test comment';
+  const viewArticlePage = new ViewArticlePage(pages[1], 2);
+  const articleSlug = articleWithoutTags.url.slice(
+    articleWithoutTags.url.lastIndexOf('/') + 1);
+
+  await viewArticlePage.open(articleWithoutTags.url);
+
+  const commentId = await viewArticlePage.addCommentAndWaitForRequest(
+    comment,
+    articleSlug,
+  );
+
+  await viewArticlePage.removeCommentAndWaitForRequest(
+    comment,
+    articleSlug,
+    commentId,
+  );
+
+  await viewArticlePage.assertNoCommentVisible(comment);
+});

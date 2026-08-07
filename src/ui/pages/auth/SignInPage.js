@@ -1,5 +1,6 @@
-import { expect } from '../../../common/helpers/pw';
+import { expect } from 'playwright/test';
 import { BasePage } from '../BasePage';
+import { ROUTES } from '../../../api/constants/apiRoutes';
 export class SignInPage extends BasePage {
   constructor(page, userId = 0) {
     super(page, userId);
@@ -8,6 +9,19 @@ export class SignInPage extends BasePage {
     this.passwordField = page.getByPlaceholder('Password');
     this.signInButton = page.getByRole('button', { name: 'Sign in' });
     this.errorMessage = page.getByRole('list').nth(1);
+  }
+
+  async clickSignInButtonAndWaitForRequest() {
+    return await this.step(
+      `Click the 'Sign in' button and wait for request `,
+      async () => {
+        const requestPromise = this.page.waitForRequest(ROUTES.users.login);
+
+        await this.signInButton.click();
+
+        return await requestPromise;
+      },
+    );
   }
 
   async fillEmailField(email) {
