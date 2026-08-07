@@ -13,6 +13,7 @@ export const ROUTES = {
   articles: (slug) => ({
     index: `${ROOT}/articles/${slug}`,
     favorite: `${ROOT}/articles/${slug}/favorite`,
+    // Use comments() for POST, comments(commentId) for DELETE
     comments: (commentId) => ({
       post: `${ROOT}/articles/${slug}/comments`,
       delete: `${ROOT}/articles/${slug}/comments/${commentId}`,

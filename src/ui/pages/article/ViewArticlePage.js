@@ -53,7 +53,7 @@ export class ViewArticlePage extends BasePage {
       })
   }
 
-  async removeCommentAndWaitForRequest(commentText, articleSlug, commentId) {
+  async removeCommentAndWaitForRequest(articleSlug, commentId) {
     return await this.step(`Remove comment and wait for request`, async () => {
       const requestPromise = this.page.waitForRequest(
         ROUTES.articles(articleSlug).comments(commentId).delete,

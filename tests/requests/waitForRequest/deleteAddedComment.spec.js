@@ -46,7 +46,6 @@ test('Delete just added comment to article created by another user', async ({
   );
 
   await viewArticlePage.removeCommentAndWaitForRequest(
-    comment,
     articleSlug,
     commentId,
   );
