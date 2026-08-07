@@ -1,6 +1,7 @@
-import { expect } from '../../../common/helpers/pw';
+import { expect } from 'playwright/test';
 import { BasePage } from '../BasePage';
 import { ArticleHeader } from '../../components/article/ArticleHeader';
+import { ROUTES } from '../../../api/constants/apiRoutes';
 
 export class ViewArticlePage extends BasePage {
   articleId;
@@ -9,6 +10,9 @@ export class ViewArticlePage extends BasePage {
     super(page, userId);
     this.articleHeader = new ArticleHeader(page);
     this.articleTitleHeader = page.getByRole('heading');
+    this.commentField = page.getByPlaceholder('Write a comment...');
+    this.postCommentButton = page.getByText('Post Comment');
+    this.deleteCommentButton = page.locator('.ion-trash-a');
     this.articleFavoriteButton = page
       .getByRole('button', {
         name: 'Favorite Article',
@@ -23,6 +27,45 @@ export class ViewArticlePage extends BasePage {
 
   tagListItem(tagName) {
     return this.page.getByRole('listitem').filter({ hasText: tagName });
+  }
+
+  async addCommentAndWaitForRequest(commentText, articleSlug) {
+    return await this.step(`Add comment and wait for request`, async () => {
+      const requestPromise = this.page.waitForRequest(
+        ROUTES.articles(articleSlug).comments().post,
+      );
+
+      const responsePromise = this.page.waitForResponse(
+        ROUTES.articles(articleSlug).comments().post,
+      );
+
+      await this.commentField.fill(commentText);
+      await this.postCommentButton.click();
+
+      const request = await requestPromise;
+      const response = await responsePromise;
+
+      expect(request.url()).toContain('comments');
+      expect(request.method()).toEqual('POST');
+
+      const body = await response.json();
+      return await body.comment.id;
+      })
+  }
+
+  async removeCommentAndWaitForRequest(articleSlug, commentId) {
+    return await this.step(`Remove comment and wait for request`, async () => {
+      const requestPromise = this.page.waitForRequest(
+        ROUTES.articles(articleSlug).comments(commentId).delete,
+      );
+
+      await this.deleteCommentButton.click();
+
+      const request = await requestPromise;
+
+      expect(request.url()).toContain('comments');
+      expect(request.method()).toEqual('DELETE');
+    });
   }
 
   async assertArticleTextIsVisible(text) {
@@ -55,5 +98,14 @@ export class ViewArticlePage extends BasePage {
         await expect(this.articleFavoriteButton).toBeVisible();
       },
     );
+  }
+
+  async assertNoCommentVisible(comment) {
+    await this.step(
+      `Assert that comment ${comment} is not visible`,
+      async () => {
+        await expect(this.page.getByText(comment)).toBeHidden();
+      }
+    )
   }
 }
