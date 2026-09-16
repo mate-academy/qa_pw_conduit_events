@@ -1,6 +1,7 @@
 import { expect } from '../../../common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ArticleHeader } from '../../components/article/ArticleHeader';
+import { ROUTES } from '../../../api/constants/apiRoutes';
 
 export class ViewArticlePage extends BasePage {
   articleId;
@@ -19,6 +20,9 @@ export class ViewArticlePage extends BasePage {
         name: 'Unfavorite Article',
       })
       .last();
+    this.commentField = page.getByPlaceholder('Write a comment...');
+    this.postCommentButton = page.getByRole('button', { name: 'Post Comment' });
+    this.deleteCommentButton = page.locator('.mod-options .ion-trash-a');
   }
 
   tagListItem(tagName) {
@@ -55,5 +59,30 @@ export class ViewArticlePage extends BasePage {
         await expect(this.articleFavoriteButton).toBeVisible();
       },
     );
+  }
+
+  async addCommentAndWaitForRequest(commentText) {
+    return await this.step(`Add comment and wait for request`, async () => {
+      const requestPromise = this.page.waitForRequest(
+        `**${ROUTES.articles('**').comments}`,
+      );
+
+      await this.commentField.fill(commentText);
+      await this.postCommentButton.click();
+
+      return await requestPromise;
+    });
+  }
+
+  async deleteCommentAndWaitForRequest() {
+    return await this.step(`Delete comment and wait for request`, async () => {
+      const requestPromise = this.page.waitForRequest(
+        `**${ROUTES.articles('**').comments}/**`,
+      );
+
+      await this.deleteCommentButton.click();
+
+      return await requestPromise;
+    });
   }
 }

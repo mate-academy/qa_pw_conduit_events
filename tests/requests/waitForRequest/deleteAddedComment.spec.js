@@ -2,6 +2,7 @@ import { test } from '../../_fixtures/fixtures';
 import { ViewArticlePage } from '../../../src/ui/pages/article/ViewArticlePage';
 import { createArticle } from '../../../src/ui/actions/articles/createArticle';
 import { signUpUser } from '../../../src/ui/actions/auth/signUpUser';
+import { expect } from '../../../src/common/helpers/pw';
 
 /*
 Preconditions:
@@ -29,4 +30,19 @@ test.beforeEach(async ({ pages, users, articleWithoutTags }) => {
   await createArticle(pages[0], articleWithoutTags, 1);
 });
 
-test('Delete just added comment to article created by another user', async ({}) => {});
+test('Delete just added comment to article created by another user', async ({
+  pages,
+  articleWithoutTags,
+}) => {
+  const viewArticlePage = new ViewArticlePage(pages[1], 2);
+
+  await viewArticlePage.open(articleWithoutTags.url);
+
+  const addRequest = await viewArticlePage.addCommentAndWaitForRequest('Nice!');
+  expect(addRequest.url()).toContain('comments');
+  expect(addRequest.method()).toEqual('POST');
+
+  const deleteRequest = await viewArticlePage.deleteCommentAndWaitForRequest();
+  expect(deleteRequest.url()).toContain('comments');
+  expect(deleteRequest.method()).toEqual('DELETE');
+});
