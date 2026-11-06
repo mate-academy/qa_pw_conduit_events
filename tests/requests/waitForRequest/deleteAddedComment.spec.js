@@ -1,7 +1,9 @@
 import { test } from '../../_fixtures/fixtures';
+import { expect } from '../../../src/common/helpers/pw';
 import { ViewArticlePage } from '../../../src/ui/pages/article/ViewArticlePage';
 import { createArticle } from '../../../src/ui/actions/articles/createArticle';
 import { signUpUser } from '../../../src/ui/actions/auth/signUpUser';
+import { generateNewCommentText } from '../../../src/common/testData/generateNewCommentText';
 
 /*
 Preconditions:
@@ -11,12 +13,12 @@ Preconditions:
 
 Test:
 1. Open article as User2
-2. Add new comment to the article and 
-  wait for request to the /api/articles/{slug}/comments 
+2. Add new comment to the article and
+  wait for request to the /api/articles/{slug}/comments
   - assert the request url contains 'comments'
   - assert the request method is POST
 3. Remove just added comment and
-  wait for request to the /api/articles/{slug}/comments/{commentId} 
+  wait for request to the /api/articles/{slug}/comments/{commentId}
   - assert the request url contains 'comments'
   - assert the request method is DELETE
 */
@@ -29,4 +31,24 @@ test.beforeEach(async ({ pages, users, articleWithoutTags }) => {
   await createArticle(pages[0], articleWithoutTags, 1);
 });
 
-test('Delete just added comment to article created by another user', async ({}) => {});
+test('Delete just added comment to article created by another user', async ({
+  articleWithoutTags,
+  pages,
+}) => {
+  const viewArticlePage = new ViewArticlePage(pages[1], 2);
+  const commentText = generateNewCommentText();
+
+  await viewArticlePage.open(articleWithoutTags.url);
+
+  const addRequest =
+    await viewArticlePage.addCommentAndWaitForRequest(commentText);
+
+  expect(addRequest.url()).toContain('comments');
+  expect(addRequest.method()).toEqual('POST');
+
+  const deleteRequest =
+    await viewArticlePage.deleteCommentAndWaitForRequest(commentText);
+
+  expect(deleteRequest.url()).toContain('comments');
+  expect(deleteRequest.method()).toEqual('DELETE');
+});
