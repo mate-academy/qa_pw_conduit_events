@@ -1,6 +1,7 @@
 import { expect } from '../../../common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ArticleHeader } from '../../components/article/ArticleHeader';
+import { ROUTES } from '../../../api/constants/apiRoutes';
 
 export class ViewArticlePage extends BasePage {
   articleId;
@@ -19,6 +20,14 @@ export class ViewArticlePage extends BasePage {
         name: 'Unfavorite Article',
       })
       .last();
+    this.commentField = page.getByPlaceholder('Write a comment...');
+    this.postCommentButton = page.getByRole('button', {
+      name: 'Post Comment',
+    });
+  }
+
+  commentCard(commentText) {
+    return this.page.locator('.card').filter({ hasText: commentText });
   }
 
   tagListItem(tagName) {
@@ -53,6 +62,35 @@ export class ViewArticlePage extends BasePage {
       `Assert the Favorite article button is shown in article body`,
       async () => {
         await expect(this.articleFavoriteButton).toBeVisible();
+      },
+    );
+  }
+
+  async addCommentAndWaitForRequest(commentText) {
+    return await this.step(`Add a comment and wait for request`, async () => {
+      await this.commentField.fill(commentText);
+
+      const requestPromise = this.page.waitForRequest(
+        `**${ROUTES.articles('**').comments}`,
+      );
+
+      await this.postCommentButton.click();
+
+      return await requestPromise;
+    });
+  }
+
+  async deleteCommentAndWaitForRequest(commentText) {
+    return await this.step(
+      `Delete the comment and wait for request`,
+      async () => {
+        const requestPromise = this.page.waitForRequest(
+          `**${ROUTES.articles('**').comments}/**`,
+        );
+
+        await this.commentCard(commentText).locator('.mod-options').click();
+
+        return await requestPromise;
       },
     );
   }
