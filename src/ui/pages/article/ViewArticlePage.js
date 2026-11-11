@@ -1,6 +1,7 @@
 import { expect } from '../../../common/helpers/pw';
 import { BasePage } from '../BasePage';
 import { ArticleHeader } from '../../components/article/ArticleHeader';
+import { ROUTES } from '../../../api/constants/apiRoutes';
 
 export class ViewArticlePage extends BasePage {
   articleId;
@@ -19,6 +20,11 @@ export class ViewArticlePage extends BasePage {
         name: 'Unfavorite Article',
       })
       .last();
+    this.postCommentButton = page.getByRole('button', {
+      name: 'Post Comment',
+    });
+    this.deleteCommentButton = page.locator('.ion-trash-a').first();
+    this.commentInput = page.getByPlaceholder('Write a comment...');
   }
 
   tagListItem(tagName) {
@@ -53,6 +59,48 @@ export class ViewArticlePage extends BasePage {
       `Assert the Favorite article button is shown in article body`,
       async () => {
         await expect(this.articleFavoriteButton).toBeVisible();
+      },
+    );
+  }
+
+  async fillCommentInput(comment) {
+    await this.step(`Fill the comment input`, async () => {
+      await this.commentInput.fill(comment);
+    });
+  }
+
+  async clickPostCommentButtonAndWaitForRequest() {
+    await this.step(
+      `Click the 'Post comment' button and wait for request`,
+      async () => {
+        const requestPromise = this.page.waitForRequest(
+          `**${ROUTES.comments('**').create}`,
+        );
+
+        await this.postCommentButton.click();
+
+        const request = await requestPromise;
+
+        expect(request.url()).toContain('comments');
+        expect(request.method()).toEqual('POST');
+      },
+    );
+  }
+
+  async clickDeleteCommentButtonAndWaitForRequest() {
+    await this.step(
+      `Click the 'Delete comment' button and wait for request`,
+      async () => {
+        const requestPromise = this.page.waitForRequest(
+          `**${ROUTES.comments('**', '*').delete}`,
+        );
+
+        await this.deleteCommentButton.click();
+
+        const request = await requestPromise;
+
+        expect(request.url()).toContain('comments');
+        expect(request.method()).toEqual('DELETE');
       },
     );
   }
