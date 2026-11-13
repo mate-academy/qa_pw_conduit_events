@@ -11,10 +11,13 @@ Test:
 4. Assert the request method is POST 
 */
 
-test('Click `Sign in` and check request sent', async ({ signInPage }) => {
+test('Click `Sign in` and check request sent', async ({
+  signInPage,
+  baseURL,
+}) => {
   await signInPage.open();
   const request = await signInPage.clickSignInButtonAndWaitForRequest();
 
-  expect(request.url()).toBe(ROUTES.users.login);
+  expect(request.url()).toBe(new URL(ROUTES.users.login, baseURL).href);
   expect(request.method()).toEqual('POST');
 });
