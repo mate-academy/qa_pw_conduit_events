@@ -15,6 +15,6 @@ test('Click `Sign in` and check request sent', async ({ signInPage }) => {
   await signInPage.open();
   const request = await signInPage.clickSignInButtonAndWaitForRequest();
 
-  expect(request.url()).toContain(ROUTES.users.login);
+  expect(request.url()).toBe(ROUTES.users.login);
   expect(request.method()).toEqual('POST');
 });

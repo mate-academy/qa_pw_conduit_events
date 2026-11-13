@@ -7,6 +7,6 @@ test('Click `Sign up` and check request sent', async ({ signUpPage }) => {
 
   const request = await signUpPage.clickSignUpButtonAndWaitForRequest();
 
-  expect(request.url()).toContain(ROUTES.users.index);
+  expect(request.url()).toBe(ROUTES.users.index);
   expect(request.method()).toEqual('POST');
 });
