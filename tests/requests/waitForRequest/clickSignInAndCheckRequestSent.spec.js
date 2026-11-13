@@ -1,4 +1,6 @@
+import { expect } from 'allure-playwright';
 import { test } from '../../_fixtures/fixtures';
+import { ROUTES } from '../../../src/api/constants/apiRoutes';
 
 /*
 Test:
@@ -9,4 +11,13 @@ Test:
 4. Assert the request method is POST 
 */
 
-test('Click `Sign in` and check request sent', async ({}) => {});
+test('Click `Sign in` and check request sent', async ({
+  signInPage,
+  baseURL,
+}) => {
+  await signInPage.open();
+  const request = await signInPage.clickSignInButtonAndWaitForRequest();
+
+  expect(request.url()).toBe(new URL(ROUTES.users.login, baseURL).href);
+  expect(request.method()).toEqual('POST');
+});
