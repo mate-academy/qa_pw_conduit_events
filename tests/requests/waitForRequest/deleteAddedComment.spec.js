@@ -29,4 +29,16 @@ test.beforeEach(async ({ pages, users, articleWithoutTags }) => {
   await createArticle(pages[0], articleWithoutTags, 1);
 });
 
-test('Delete just added comment to article created by another user', async ({}) => {});
+test('Delete just added comment to article created by another user', async ({
+  pages,
+  articleWithoutTags,
+}) => {
+  const viewArticlePage = new ViewArticlePage(pages[1], 2);
+  const comments = viewArticlePage.comments;
+  const commentText = 'My test comment';
+
+  await viewArticlePage.open(articleWithoutTags.url);
+
+  await comments.addCommentAndWaitForRequest(commentText);
+  await comments.deleteCommentAndWaitForRequest(commentText);
+});

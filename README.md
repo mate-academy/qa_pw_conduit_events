@@ -22,7 +22,7 @@ In this task you will practice using the waitForRequest method.
 
 
 ## Main Task
-1. Create test `tests/requests/waitForRequest/clickSignInAndCheckRequestSent.spec`.
+1. Create test `tests/requests/waitForRequest/clickSignInAndCheckRequestSent.spec`. +
 - Use steps defined within the test comments.
 - Use as an example 'clickSignUpAndCheckRequestSent.spec`
 2. Create test `tests/requests/waitForRequest/deleteAddedComment.spec`.
